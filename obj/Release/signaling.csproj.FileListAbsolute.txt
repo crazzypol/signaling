@@ -1,0 +1,5 @@
+C:\Users\nik\Documents\GitHub\signaling\bin\Release\signaling.dll
+C:\Users\nik\Documents\GitHub\signaling\bin\Release\signaling.pdb
+C:\Users\nik\Documents\GitHub\signaling\obj\Release\ResolveAssemblyReference.cache
+C:\Users\nik\Documents\GitHub\signaling\obj\Release\signaling.dll
+C:\Users\nik\Documents\GitHub\signaling\obj\Release\signaling.pdb
