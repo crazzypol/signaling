@@ -12,6 +12,7 @@ namespace signaling
         const int MCASTPORT = 32760;                // Порт для UDP сокета
         string MYIPADDR;                            // Наш адрес
 
+        Socket _socket;
         bool IsThreadRunning = false; // Переменная управляющая потоком слушателя
         Thread _listener; // Переменная класса для создания отдельного потока для слушателя сети
 
@@ -29,7 +30,7 @@ namespace signaling
         public void StopListen()
         {
             IsThreadRunning = false;
-            
+            _socket.Close();
         }
 
         public void SendMessage(byte[] message)
@@ -90,7 +91,7 @@ namespace signaling
         /// <param name="port"></param>
         private void _receive(string address, int port)
         {
-            Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint _ipendp = new IPEndPoint(IPAddress.Any, port);
             _socket.Bind(_ipendp);
             IsThreadRunning = true;
@@ -100,9 +101,10 @@ namespace signaling
                 try
                 {
                     _socket.Receive(_receivebuf);
+                    myReceivedMessage(_receivebuf);
                 }
-                catch (Exception) { }
-                myReceivedMessage(_receivebuf);
+                catch (Exception) {}
+                
             }
         }
 
