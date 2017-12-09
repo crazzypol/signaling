@@ -1,16 +1,15 @@
 ﻿using System.Threading;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System;
 
 namespace signaling
 {
     public class Mynetwork
     {
-        const string MCASTADDR = "255.255.255.255"; // Широковещательный адрес
-        const int MCASTPORT = 32760;                // Порт для UDP сокета
-        string MYIPADDR;                            // Наш адрес
+        //const string MCASTADDR = "255.255.255.255"; // Широковещательный адрес
+        int MCASTPORT;                // Порт для UDP сокета
+        string MYIPADDR;              // Наш адрес
 
         Socket _socket;
         bool IsThreadRunning = false; // Переменная управляющая потоком слушателя
@@ -20,29 +19,7 @@ namespace signaling
         public event ReceivedMessage myReceivedMessage; // Нашt событие для делегата
 
         
-        public void Listen()
-        {
-            // Создаем и запускам отдельный поток-слушатель сети
-            _listener = new Thread(new ThreadStart(_receiveWorker));
-            _listener.Start();
-        }
-
-        public void StopListen()
-        {
-            IsThreadRunning = false;
-            _socket.Close();
-        }
-
-        public void SendMessage(byte[] message)
-        {
-            _multicastSend(MYIPADDR, MCASTPORT, message);
-        }
-
-        /// <summary>
-        /// Поток-слушатель сети
-        /// Функция передается в ThreadStart
-        /// </summary>
-        private void _receiveWorker()
+        public Mynetwork() 
         {
             // Узнаем свой адрес в сети
             // Сетевой адаптер должен быть корректно настроен
@@ -56,7 +33,54 @@ namespace signaling
                     MYIPADDR = _oneaddr.ToString();
                 }
             }
-            _receive(MYIPADDR, MCASTPORT);
+        }
+
+        public void Listen()
+        {
+            // Создаем и запускам отдельный поток-слушатель сети
+            _listener = new Thread(new ThreadStart(_receiveWorker));
+            _listener.Start();
+        }
+
+        public void StopListen()
+        {
+            IsThreadRunning = false;
+            if (_socket != null)_socket.Close();
+        }
+
+        public bool IsListen
+        {
+            get {
+                return IsThreadRunning;
+            }
+        }
+
+        public void SendMessage(byte[] message)
+        {
+            _multicastSend(MYIPADDR, MCASTPORT, message);
+        }
+
+        public string port
+        {
+            set {
+                int localvlu = Convert.ToInt32(value);
+                if (localvlu > 1024 && localvlu < 32768)
+                {
+                    MCASTPORT = localvlu;
+                }
+            }
+            get { 
+                return MCASTPORT.ToString (); 
+            }
+        }
+
+        /// <summary>
+        /// Поток-слушатель сети
+        /// Функция передается в ThreadStart
+        /// </summary>
+        private void _receiveWorker()
+        {
+             _receive(MYIPADDR, MCASTPORT);
         }
         
         /// <summary>
@@ -103,8 +127,9 @@ namespace signaling
                     _socket.Receive(_receivebuf);
                     myReceivedMessage(_receivebuf);
                 }
-                catch (Exception) {}
-                
+                catch (Exception) {
+                    IsThreadRunning = false;
+                }
             }
         }
 
