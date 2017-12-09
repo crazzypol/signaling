@@ -7,7 +7,6 @@ namespace signaling
 {
     public class Mynetwork
     {
-        //const string MCASTADDR = "255.255.255.255"; // Широковещательный адрес
         int MCASTPORT;                // Порт для UDP сокета
         string MYIPADDR;              // Наш адрес
 
@@ -71,6 +70,14 @@ namespace signaling
             }
             get { 
                 return MCASTPORT.ToString (); 
+            }
+        }
+
+        public string ipaddr
+        {
+            get
+            {
+                return MYIPADDR;
             }
         }
 
